@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "shardthief",
+	"version": "${version}",
+	"name": "Shard Thief",
+	"description": "An avoidance minigame for Minecraft.",
+	"authors": [
+		"haykam821"
+	],
+	"contact": {
+		"homepage": "https://github.com/haykam821/Shard-Thief#readme",
+		"issues": "https://github.com/haykam821/Shard-Thief/issues"
+	},
+	"entrypoints": {
+		"main": [
+			"io.github.haykam821.shardthief.Main"
+		]
+	},
+	"accessWidener": "shardthief.accesswidener",
+	"license": "MIT",
+	"icon": "assets/shardthief/icon.png",
+	"depends": {
+		"fabricloader": ">=0.4.0"
+	}
+}
