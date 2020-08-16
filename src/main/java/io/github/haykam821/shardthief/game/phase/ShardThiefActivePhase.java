@@ -12,6 +12,8 @@ import io.github.haykam821.shardthief.game.map.ShardThiefMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -150,6 +152,8 @@ public class ShardThiefActivePhase {
 		this.droppedShard.reset(this.world);
 		this.droppedShard = null;
 
+		this.applyStealSpeed(entry.getPlayer());
+	
 		this.world.playSound(null, entry.getPlayer().getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
 		this.sendStealMessage();
 	}
@@ -269,6 +273,11 @@ public class ShardThiefActivePhase {
 		this.countBar.removePlayer(player);
 	}
 
+	private void applyStealSpeed(ServerPlayerEntity player) {
+		if (this.config.getSpeedAmplifier() <= 0) return;
+		player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, this.config.getShardInvulnerability() * 2, this.config.getSpeedAmplifier(), true, false, true));
+	}
+
 	private void tryTransferShard(ServerPlayerEntity damagedPlayer, DamageSource source) {
 		if (!(source.getAttacker() instanceof ServerPlayerEntity)) return;
 		ServerPlayerEntity attacker = (ServerPlayerEntity) source.getAttacker();
@@ -288,6 +297,7 @@ public class ShardThiefActivePhase {
 					}
  				} else if (this.shardHolder.canBeStolen()) {
 					this.setShardHolder(entry);
+					this.applyStealSpeed(entry.getPlayer());
 					this.sendStealMessage();
 				}
 				return;
