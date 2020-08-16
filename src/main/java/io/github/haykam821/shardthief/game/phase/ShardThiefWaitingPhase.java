@@ -18,6 +18,7 @@ import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.event.RequestStartListener;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.game.world.bubble.BubbleWorldConfig;
 
 public class ShardThiefWaitingPhase {
@@ -43,7 +44,7 @@ public class ShardThiefWaitingPhase {
 			ShardThiefWaitingPhase waiting = new ShardThiefWaitingPhase(gameWorld, map, context.getConfig());
 
 			gameWorld.openGame(game -> {
-				ShardThiefActivePhase.setRules(game);
+				ShardThiefActivePhase.setRules(game, RuleResult.DENY);
 
 				// Listeners
 				game.on(PlayerAddListener.EVENT, waiting::addPlayer);

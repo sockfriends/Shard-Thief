@@ -64,12 +64,12 @@ public class ShardThiefActivePhase {
 		this.placeShard(new BlockPos(size.getX(), 64, size.getZ()));
 	}
 
-	public static void setRules(Game game) {
+	public static void setRules(Game game, RuleResult pvpRule) {
 		game.setRule(GameRule.CRAFTING, RuleResult.DENY);
 		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
 		game.setRule(GameRule.HUNGER, RuleResult.DENY);
 		game.setRule(GameRule.PORTALS, RuleResult.DENY);
-		game.setRule(GameRule.PVP, RuleResult.ALLOW);
+		game.setRule(GameRule.PVP, pvpRule);
 		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 	}
 
@@ -77,7 +77,7 @@ public class ShardThiefActivePhase {
 		ShardThiefActivePhase active = new ShardThiefActivePhase(gameWorld, map, config, gameWorld.getPlayers());
 
 		gameWorld.openGame(game -> {
-			ShardThiefActivePhase.setRules(game);
+			ShardThiefActivePhase.setRules(game, RuleResult.ALLOW);
 
 			// Listeners
 			game.on(GameCloseListener.EVENT, active::close);
