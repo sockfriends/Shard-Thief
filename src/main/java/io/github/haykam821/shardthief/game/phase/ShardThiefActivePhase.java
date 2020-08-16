@@ -11,8 +11,8 @@ import io.github.haykam821.shardthief.game.map.ShardThiefMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -71,6 +71,7 @@ public class ShardThiefActivePhase {
 		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
 		game.setRule(GameRule.HUNGER, RuleResult.DENY);
 		game.setRule(GameRule.PORTALS, RuleResult.DENY);
+		game.setRule(GameRule.PVP, RuleResult.ALLOW);
 		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 	}
 
@@ -132,7 +133,9 @@ public class ShardThiefActivePhase {
 
 	private void pickUpShard(PlayerShardEntry entry) {
 		this.setShardHolder(entry);
+
 		this.world.setBlockState(this.droppedShardPos, this.droppedShardOldState);
+		this.droppedShardPos = null;
 
 		this.world.playSound(null, entry.getPlayer().getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
 	}
@@ -201,7 +204,7 @@ public class ShardThiefActivePhase {
 	}
 
 	private boolean isStandingOnDroppedShard(PlayerEntity player) {
-		return this.droppedShardPos.equals(player.getLandingPos());
+		return this.droppedShardPos != null && this.droppedShardPos.equals(player.getLandingPos());
 	}
 
 	private void tick() {
@@ -238,33 +241,43 @@ public class ShardThiefActivePhase {
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
+		// Drop shard when player is removed
+		if (player.equals(this.shardHolder.getPlayer())) {
+			this.dropShard();
+		}
+
 		this.players.removeIf(entry -> {
 			return player.equals(entry.getPlayer());
 		});
 		this.countBar.removePlayer(player);
 	}
 
-	private boolean isTransferringDamageSource(DamageSource source) {
-		if (!source.isProjectile() || !(source instanceof EntityDamageSource)) return false;
-		if (!(source.getAttacker() instanceof PlayerEntity)) return false;
-		
-		return true;
-	}
+	private void tryTransferShard(ServerPlayerEntity damagedPlayer, DamageSource source) {
+		if (!(source.getAttacker() instanceof ServerPlayerEntity)) return;
+		ServerPlayerEntity attacker = (ServerPlayerEntity) source.getAttacker();
 
-	private boolean onPlayerDamage(ServerPlayerEntity player, DamageSource source, float damage) {
-		if (this.isTransferringDamageSource(source)) {
-			for (PlayerShardEntry entry : this.players) {
-				if (source.getAttacker() == entry.getPlayer()) {
-					if (source.isProjectile()) {
-						this.dropShard();
-					} else {
-						this.setShardHolder(entry);
+		PlayerEntity shardPlayer = this.shardHolder.getPlayer();
+		if (!damagedPlayer.equals(shardPlayer)) return;
+		if (attacker.equals(shardPlayer)) return;
+
+		for (PlayerShardEntry entry : this.players) {
+			if (attacker.equals(entry.getPlayer())) {
+				if (source.isProjectile()) {
+					this.dropShard();
+					if (source.getSource() instanceof ProjectileEntity) {
+						source.getSource().kill();
 					}
-					return false;
+ 				} else {
+					this.setShardHolder(entry);
 				}
+				return;
 			}
 		}
-		return false;
+	}
+
+	private boolean onPlayerDamage(ServerPlayerEntity damagedPlayer, DamageSource source, float damage) {
+		this.tryTransferShard(damagedPlayer, source);
+		return true;
 	}
 
 	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
