@@ -132,6 +132,14 @@ public class ShardThiefActivePhase {
 		ShardInventoryManager.giveShardInventory(entry.getPlayer());
 	}
 
+	private void sendStealMessage() {
+		Text stealText = this.shardHolder.getStealMessage();
+		for (PlayerShardEntry entry : this.players) {
+			TitleS2CPacket packet = new TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, stealText);
+			entry.getPlayer().networkHandler.sendPacket(packet);
+		}
+	}
+
 	private void pickUpShard(PlayerShardEntry entry) {
 		this.setShardHolder(entry);
 
@@ -139,6 +147,7 @@ public class ShardThiefActivePhase {
 		this.droppedShard = null;
 
 		this.world.playSound(null, entry.getPlayer().getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
+		this.sendStealMessage();
 	}
 
 	private BlockPos findDropPos(BlockPos initialPos) {
@@ -183,7 +192,7 @@ public class ShardThiefActivePhase {
 	private void tickCounts() {
 		this.shardHolder.decrementCounts();
 		if (this.shardHolder.getCounts() <= 0) {
-			Text message = this.getWinMessage();
+			Text message = this.shardHolder.getWinMessage();
 			for (PlayerShardEntry entry : this.players) {
 				entry.getPlayer().sendMessage(message, false);
 				entry.getPlayer().playSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
@@ -234,10 +243,6 @@ public class ShardThiefActivePhase {
 		}
 	}
 
-	private Text getWinMessage() {
-		return this.shardHolder.getWinMessage();
-	}
-
 	private void setSpectator(PlayerEntity player) {
 		player.setGameMode(GameMode.SPECTATOR);
 	}
@@ -278,6 +283,7 @@ public class ShardThiefActivePhase {
 					}
  				} else {
 					this.setShardHolder(entry);
+					this.sendStealMessage();
 				}
 				return;
 			}

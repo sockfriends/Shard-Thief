@@ -1,6 +1,8 @@
 package io.github.haykam821.shardthief.game;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -35,6 +37,11 @@ public class PlayerShardEntry implements Comparable<PlayerShardEntry> {
 
 	public Text getWinMessage() {
 		return this.getPlayer().getDisplayName().shallowCopy().append(" has won the game!").formatted(Formatting.GOLD);
+	}
+
+	public Text getStealMessage() {
+		MutableText playerName = this.getPlayer().getDisplayName().shallowCopy().formatted(Formatting.AQUA);
+		return playerName.append(new LiteralText(" has stolen the shard!").formatted(Formatting.WHITE));
 	}
 
 	@Override
