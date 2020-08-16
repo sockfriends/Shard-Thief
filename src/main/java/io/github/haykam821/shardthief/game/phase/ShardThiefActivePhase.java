@@ -96,6 +96,7 @@ public class ShardThiefActivePhase {
 		for (PlayerShardEntry entry : this.players) {
 			ServerPlayerEntity player = entry.getPlayer();
 			player.setGameMode(GameMode.ADVENTURE);
+			ShardInventoryManager.giveNonShardInventory(player);
 			ShardThiefActivePhase.spawn(this.world, this.map, player);
 		}
 	}
@@ -115,6 +116,7 @@ public class ShardThiefActivePhase {
 		if (this.shardHolder == null) return;
 
 		this.shardHolder.getPlayer().inventory.clear();
+		ShardInventoryManager.giveNonShardInventory(this.shardHolder.getPlayer());
 
 		if (this.shardHolder.getCounts() < this.config.getRestartCounts()) {
 			this.shardHolder.setCounts(this.config.getRestartCounts());
@@ -126,8 +128,9 @@ public class ShardThiefActivePhase {
 
 	private void setShardHolder(PlayerShardEntry entry) {
 		this.clearShard();
-
 		this.shardHolder = entry;
+
+		entry.getPlayer().inventory.clear();
 		ShardInventoryManager.giveShardInventory(entry.getPlayer());
 	}
 
