@@ -57,7 +57,7 @@ public class ShardThiefActivePhase {
 		this.config = config;
 
 		this.players = players.stream().map(player -> {
-			return new PlayerShardEntry(player, this.config.getStartingCounts());
+			return new PlayerShardEntry(player, this.config.getStartingCounts(), this.config.getShardInvulnerability());
 		}).collect(Collectors.toSet());
 
 		BlockPos size = this.map.getStructure().getSize();
@@ -169,7 +169,7 @@ public class ShardThiefActivePhase {
 	}
 
 	private void placeShard(BlockPos pos) {
-		this.droppedShard = new DroppedShard(pos, this.world.getBlockState(pos), this.config.getDroppedShardInvulnerability());
+		this.droppedShard = new DroppedShard(pos, this.world.getBlockState(pos), this.config.getShardInvulnerability());
 		this.droppedShard.place(this.world);
 	}
 
@@ -238,6 +238,7 @@ public class ShardThiefActivePhase {
 		}
 
 		for (PlayerShardEntry entry : this.players) {
+			entry.tick();
 			if (entry.equals(this.shardHolder)) continue;
 
 			ServerPlayerEntity player = entry.getPlayer();
@@ -285,7 +286,7 @@ public class ShardThiefActivePhase {
 					if (source.getSource() instanceof ProjectileEntity) {
 						source.getSource().kill();
 					}
- 				} else {
+ 				} else if (this.shardHolder.canBeStolen()) {
 					this.setShardHolder(entry);
 					this.sendStealMessage();
 				}

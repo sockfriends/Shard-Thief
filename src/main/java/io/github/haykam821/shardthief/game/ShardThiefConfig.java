@@ -11,20 +11,20 @@ public class ShardThiefConfig {
 			PlayerConfig.CODEC.fieldOf("players").forGetter(ShardThiefConfig::getPlayerConfig),
 			Codec.INT.optionalFieldOf("starting_counts", 20).forGetter(ShardThiefConfig::getStartingCounts),
 			Codec.INT.optionalFieldOf("restart_counts", 5).forGetter(ShardThiefConfig::getRestartCounts),
-			Codec.INT.optionalFieldOf("dropped_shard_invulnerability", 10).forGetter(ShardThiefConfig::getDroppedShardInvulnerability)
+			Codec.INT.optionalFieldOf("shard_invulnerability", 10).forGetter(ShardThiefConfig::getShardInvulnerability)
 		).apply(instance, ShardThiefConfig::new);
 	});
 
 	private final PlayerConfig playerConfig;
 	private final int startingCounts;
 	private final int restartCounts;
-	private final int droppedShardInvulnerability;
+	private final int shardInvulnerability;
 
-	public ShardThiefConfig(PlayerConfig playerConfig, int startingCounts, int restartCounts, int droppedShardInvulnerability) {
+	public ShardThiefConfig(PlayerConfig playerConfig, int startingCounts, int restartCounts, int shardInvulnerability) {
 		this.playerConfig = playerConfig;
 		this.startingCounts = startingCounts;
 		this.restartCounts = restartCounts;
-		this.droppedShardInvulnerability = droppedShardInvulnerability;
+		this.shardInvulnerability = shardInvulnerability;
 	}
 
 	public PlayerConfig getPlayerConfig() {
@@ -39,7 +39,7 @@ public class ShardThiefConfig {
 		return this.restartCounts;
 	}
 
-	public int getDroppedShardInvulnerability() {
-		return this.droppedShardInvulnerability;
+	public int getShardInvulnerability() {
+		return this.shardInvulnerability;
 	}
 }

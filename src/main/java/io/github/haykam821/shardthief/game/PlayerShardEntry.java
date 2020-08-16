@@ -5,18 +5,21 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Tickable;
 
-public class PlayerShardEntry implements Comparable<PlayerShardEntry> {
+public class PlayerShardEntry implements Comparable<PlayerShardEntry>, Tickable {
 	private final ServerPlayerEntity player;
 	private int counts;
+	private int invulnerability;
 
-	public PlayerShardEntry(ServerPlayerEntity player, int counts) {
+	public PlayerShardEntry(ServerPlayerEntity player, int counts, int invulnerability) {
 		this.player = player;
 		this.counts = counts;
+		this.invulnerability = invulnerability;
 	}
 
-	public PlayerShardEntry(ServerPlayerEntity player) {
-		this(player, 20);
+	public PlayerShardEntry(ServerPlayerEntity player, int invulnerability) {
+		this(player, 20, invulnerability);
 	}
 
 	public ServerPlayerEntity getPlayer() {
@@ -42,6 +45,17 @@ public class PlayerShardEntry implements Comparable<PlayerShardEntry> {
 	public Text getStealMessage() {
 		MutableText playerName = this.getPlayer().getDisplayName().shallowCopy().formatted(Formatting.AQUA);
 		return playerName.append(new LiteralText(" has stolen the shard!").formatted(Formatting.WHITE));
+	}
+
+	public boolean canBeStolen() {
+		return this.invulnerability <= 0;
+	}
+
+	@Override
+	public void tick() {
+		if (this.invulnerability > 0) {
+			this.invulnerability -= 1;
+		}
 	}
 
 	@Override
