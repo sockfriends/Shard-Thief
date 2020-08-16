@@ -156,7 +156,7 @@ public class ShardThiefActivePhase {
 	}
 
 	private void placeShard(BlockPos pos) {
-		this.droppedShard = new DroppedShard(pos, this.world.getBlockState(pos));
+		this.droppedShard = new DroppedShard(pos, this.world.getBlockState(pos), this.config.getDroppedShardInvulnerability());
 		this.droppedShard.place(this.world);
 	}
 
@@ -206,12 +206,16 @@ public class ShardThiefActivePhase {
 		this.ticksUntilCount = 35;
 	}
 
-	private boolean isStandingOnDroppedShard(PlayerEntity player) {
-		return this.droppedShard != null && this.droppedShard.isPlayerStandingOn(player);
+	private boolean canPlayerPickUpDroppedShard(PlayerEntity player) {
+		return this.droppedShard != null && this.droppedShard.canPlayerPickUp(player);
 	}
 
 	private void tick() {
 		this.countBar.tick(this);
+
+		if (this.droppedShard != null) {
+			this.droppedShard.tick();
+		}
 	
 		if (this.shardHolder != null) {
 			if (this.ticksUntilCount <= 0) {
@@ -224,7 +228,7 @@ public class ShardThiefActivePhase {
 			if (entry.equals(this.shardHolder)) continue;
 
 			ServerPlayerEntity player = entry.getPlayer();
-			if (this.isStandingOnDroppedShard(player)) {
+			if (this.canPlayerPickUpDroppedShard(player)) {
 				this.pickUpShard(entry);
 			}
 		}

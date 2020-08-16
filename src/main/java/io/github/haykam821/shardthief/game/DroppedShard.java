@@ -5,19 +5,22 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
 
-public class DroppedShard {
+public class DroppedShard implements Tickable {
 	private static final BlockState FULL_DROP_STATE = Blocks.PRISMARINE.getDefaultState();
 	private static final BlockState SLAB_DROP_STATE = Blocks.PRISMARINE_SLAB.getDefaultState();
 
 	private final BlockPos pos;
 	private final BlockState oldState;
+	private int invulnerability;
 
-	public DroppedShard(BlockPos pos, BlockState oldState) {
+	public DroppedShard(BlockPos pos, BlockState oldState, int invulnerability) {
 		this.pos = pos;
 		this.oldState = oldState;
+		this.invulnerability = invulnerability;
 	}
 
 	private BlockState getBlockState() {
@@ -37,7 +40,14 @@ public class DroppedShard {
 		world.setBlockState(this.pos, this.oldState, 3);
 	}
 
-	public boolean isPlayerStandingOn(PlayerEntity player) {
-		return this.pos.equals(player.getLandingPos());
+	public boolean canPlayerPickUp(PlayerEntity player) {
+		return this.invulnerability <= 0 && this.pos.equals(player.getLandingPos());
+	}
+
+	@Override
+	public void tick() {
+		if (this.invulnerability > 0) {
+			this.invulnerability -= 1;
+		}
 	}
 }
