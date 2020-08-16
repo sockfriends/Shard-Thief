@@ -91,11 +91,15 @@ public class ShardThiefActivePhase {
 	}
 
 	private void open() {
+		int index = 0;
 		for (PlayerShardEntry entry : this.players) {
 			ServerPlayerEntity player = entry.getPlayer();
+
 			player.setGameMode(GameMode.ADVENTURE);
 			ShardInventoryManager.giveNonShardInventory(player);
-			ShardThiefActivePhase.spawn(this.world, this.map, player);
+
+			ShardThiefActivePhase.spawn(this.world, this.map, player, index);
+			index += 1;
 		}
 	}
 
@@ -296,12 +300,17 @@ public class ShardThiefActivePhase {
 	}
 
 	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
-		ShardThiefActivePhase.spawn(this.world, this.map, player);
+		ShardThiefActivePhase.spawn(this.world, this.map, player, 0);
 		return ActionResult.SUCCESS;
 	}
 
-	public static void spawn(ServerWorld world, ShardThiefMap map, ServerPlayerEntity player) {
+	public static void spawn(ServerWorld world, ShardThiefMap map, ServerPlayerEntity player, int index) {
 		BlockPos size = map.getStructure().getSize();
-		player.teleport(world, size.getX(), 65, size.getZ() - 8, 0, 0);
+
+		Direction direction = Direction.fromHorizontal(index);
+		int distance = (int) Math.min(index / 4f + 4, 8);
+		BlockPos pos = new BlockPos(size.getX(), 65, size.getZ()).offset(direction.getOpposite(), distance);
+
+		player.teleport(world, pos.getX(), pos.getY(), pos.getZ(), direction.asRotation(), 0);
 	}
 }

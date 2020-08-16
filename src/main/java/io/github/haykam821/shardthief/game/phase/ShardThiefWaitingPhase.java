@@ -73,12 +73,12 @@ public class ShardThiefWaitingPhase {
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
-		ShardThiefActivePhase.spawn(this.gameWorld.getWorld(), this.map, player);
+		ShardThiefActivePhase.spawn(this.gameWorld.getWorld(), this.map, player, this.gameWorld.getPlayerCount() - 1);
 	}
 
 	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
 		// Respawn player
-		ShardThiefActivePhase.spawn(this.gameWorld.getWorld(), this.map, player);
+		ShardThiefActivePhase.spawn(this.gameWorld.getWorld(), this.map, player, 0);
 		return ActionResult.SUCCESS;
 	}
 }
