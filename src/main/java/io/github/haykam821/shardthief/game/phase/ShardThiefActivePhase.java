@@ -10,7 +10,6 @@ import io.github.haykam821.shardthief.game.ShardThiefConfig;
 import io.github.haykam821.shardthief.game.ShardThiefCountBar;
 import io.github.haykam821.shardthief.game.map.ShardThiefMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -164,7 +163,7 @@ public class ShardThiefActivePhase {
 			if (pos.getY() == 0) return pos;
 
 			BlockState state = this.world.getBlockState(pos);
-			if (state.isSolidBlock(world, pos) || state.getBlock() instanceof SlabBlock) {
+			if (DroppedShard.isDroppableOn(state, this.world, pos)) {
 				return pos;
 			}
 
