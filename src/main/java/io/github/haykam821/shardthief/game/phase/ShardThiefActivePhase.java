@@ -133,6 +133,7 @@ public class ShardThiefActivePhase {
 	private void setShardHolder(PlayerShardEntry entry) {
 		this.clearShard();
 		this.shardHolder = entry;
+		entry.setInvulnerability(this.config.getShardInvulnerability());
 
 		entry.getPlayer().inventory.clear();
 		ShardInventoryManager.giveShardInventory(entry.getPlayer());

@@ -47,6 +47,10 @@ public class PlayerShardEntry implements Comparable<PlayerShardEntry>, Tickable 
 		return playerName.append(new LiteralText(" has stolen the shard!").formatted(Formatting.WHITE));
 	}
 
+	public void setInvulnerability(int invulnerability) {
+		this.invulnerability = invulnerability;
+	}
+
 	public boolean canBeStolen() {
 		return this.invulnerability <= 0;
 	}
