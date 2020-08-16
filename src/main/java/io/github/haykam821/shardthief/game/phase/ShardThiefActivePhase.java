@@ -3,13 +3,14 @@ package io.github.haykam821.shardthief.game.phase;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.github.haykam821.shardthief.game.DroppedShard;
 import io.github.haykam821.shardthief.game.PlayerShardEntry;
 import io.github.haykam821.shardthief.game.ShardInventoryManager;
 import io.github.haykam821.shardthief.game.ShardThiefConfig;
 import io.github.haykam821.shardthief.game.ShardThiefCountBar;
 import io.github.haykam821.shardthief.game.map.ShardThiefMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -38,8 +39,6 @@ import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 
 public class ShardThiefActivePhase {
-	private static final BlockState SHARD_DROP_STATE = Blocks.PRISMARINE.getDefaultState();
-
 	private final ServerWorld world;
 	private final GameWorld gameWorld;
 	private final ShardThiefMap map;
@@ -49,8 +48,7 @@ public class ShardThiefActivePhase {
 
 	private PlayerShardEntry shardHolder;
 	private int ticksUntilCount;
-	private BlockPos droppedShardPos;
-	private BlockState droppedShardOldState;
+	private DroppedShard droppedShard;
 
 	public ShardThiefActivePhase(GameWorld gameWorld, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players) {
 		this.world = gameWorld.getWorld();
@@ -137,8 +135,8 @@ public class ShardThiefActivePhase {
 	private void pickUpShard(PlayerShardEntry entry) {
 		this.setShardHolder(entry);
 
-		this.world.setBlockState(this.droppedShardPos, this.droppedShardOldState);
-		this.droppedShardPos = null;
+		this.droppedShard.reset(this.world);
+		this.droppedShard = null;
 
 		this.world.playSound(null, entry.getPlayer().getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
 	}
@@ -146,18 +144,20 @@ public class ShardThiefActivePhase {
 	private BlockPos findDropPos(BlockPos initialPos) {
 		BlockPos.Mutable pos = initialPos.mutableCopy();
 		while (true) {
-			if (pos.getY() == 0 || this.world.getBlockState(pos).isSolidBlock(world, pos)) {
+			if (pos.getY() == 0) return pos;
+
+			BlockState state = this.world.getBlockState(pos);
+			if (state.isSolidBlock(world, pos) || state.getBlock() instanceof SlabBlock) {
 				return pos;
 			}
+
 			pos.move(Direction.DOWN);
 		}
 	}
 
 	private void placeShard(BlockPos pos) {
-		this.droppedShardPos = pos;
-		this.droppedShardOldState = this.world.getBlockState(pos);
-
-		this.world.setBlockState(pos, SHARD_DROP_STATE);
+		this.droppedShard = new DroppedShard(pos, this.world.getBlockState(pos));
+		this.droppedShard.place(this.world);
 	}
 
 	private void dropShard() {
@@ -207,7 +207,7 @@ public class ShardThiefActivePhase {
 	}
 
 	private boolean isStandingOnDroppedShard(PlayerEntity player) {
-		return this.droppedShardPos != null && this.droppedShardPos.equals(player.getLandingPos());
+		return this.droppedShard != null && this.droppedShard.isPlayerStandingOn(player);
 	}
 
 	private void tick() {
@@ -245,7 +245,7 @@ public class ShardThiefActivePhase {
 
 	private void removePlayer(ServerPlayerEntity player) {
 		// Drop shard when player is removed
-		if (player.equals(this.shardHolder.getPlayer())) {
+		if (this.shardHolder != null && player.equals(this.shardHolder.getPlayer())) {
 			this.dropShard();
 		}
 
@@ -258,6 +258,8 @@ public class ShardThiefActivePhase {
 	private void tryTransferShard(ServerPlayerEntity damagedPlayer, DamageSource source) {
 		if (!(source.getAttacker() instanceof ServerPlayerEntity)) return;
 		ServerPlayerEntity attacker = (ServerPlayerEntity) source.getAttacker();
+
+		if (this.shardHolder == null) return;
 
 		PlayerEntity shardPlayer = this.shardHolder.getPlayer();
 		if (!damagedPlayer.equals(shardPlayer)) return;
