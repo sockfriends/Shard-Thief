@@ -5,6 +5,8 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 
 public class ShardInventoryManager {
@@ -39,9 +41,21 @@ public class ShardInventoryManager {
 
 	public static void giveNonShardInventory(ServerPlayerEntity player) {
 		player.inventory.setStack(0, NON_SHARD_HOLDER_BOW.copy());
-		player.inventory.setStack(27, NON_SHARD_HOLDER_ARROW.copy());
-
 		ShardInventoryManager.updateInventory(player);
+	}
+
+	public static void restockArrows(ServerPlayerEntity player, int maxArrows) {
+		int arrows = player.inventory.count(NON_SHARD_HOLDER_ARROW.getItem());
+		if (arrows <= maxArrows) {
+			player.inventory.clear();
+			ShardInventoryManager.giveNonShardInventory(player);
+
+			ItemStack arrowStack = NON_SHARD_HOLDER_ARROW.copy();
+			arrowStack.setCount(arrows + 1);
+			player.inventory.setStack(1, arrowStack);
+
+			player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
+		}
 	}
 
 	private static ItemStack createArmorStack(ItemConvertible item) {
@@ -54,7 +68,7 @@ public class ShardInventoryManager {
 
 	private static ItemStack createBowStack(ItemConvertible item) {
 		return ItemStackBuilder.of(item)
-			.addEnchantment(Enchantments.INFINITY, 1)
+			.addEnchantment(Enchantments.MENDING, 1)
 			.setUnbreakable()
 			.build();
 	}

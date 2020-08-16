@@ -49,6 +49,7 @@ public class ShardThiefActivePhase {
 
 	private PlayerShardEntry shardHolder;
 	private int ticksUntilCount;
+	private int ticksUntilKitRestock;
 	private DroppedShard droppedShard;
 
 	public ShardThiefActivePhase(GameWorld gameWorld, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players) {
@@ -226,12 +227,26 @@ public class ShardThiefActivePhase {
 		return this.droppedShard != null && this.droppedShard.canPlayerPickUp(player);
 	}
 
+	private void restockKits() {
+		for (PlayerShardEntry entry : this.players) {
+			if (!entry.equals(this.shardHolder)) {
+				ShardInventoryManager.restockArrows(entry.getPlayer(), this.config.getMaxArrows());
+			}
+		}
+		this.ticksUntilKitRestock = this.config.getKitRestockInterval();
+	}
+
 	private void tick() {
 		this.countBar.tick(this);
 
 		if (this.droppedShard != null) {
 			this.droppedShard.tick();
 		}
+
+		if (this.ticksUntilKitRestock <= 0) {
+			this.restockKits();
+		}
+		this.ticksUntilKitRestock -= 1;
 	
 		if (this.shardHolder != null) {
 			if (this.ticksUntilCount <= 0) {
