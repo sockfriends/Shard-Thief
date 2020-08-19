@@ -19,7 +19,7 @@ import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.event.RequestStartListener;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.game.world.bubble.BubbleWorldConfig;
+import xyz.nucleoid.plasmid.world.bubble.BubbleWorldConfig;
 
 public class ShardThiefWaitingPhase {
 	private final GameWorld gameWorld;
@@ -32,25 +32,28 @@ public class ShardThiefWaitingPhase {
 		this.config = config;
 	}
 
-	public static CompletableFuture<Void> open(GameOpenContext<ShardThiefConfig> context) {
+	public static CompletableFuture<GameWorld> open(GameOpenContext<ShardThiefConfig> context) {
 		ShardThiefMapBuilder mapBuilder = new ShardThiefMapBuilder();
 
-		return mapBuilder.create(context.getServer()).thenAccept(map -> {
+		return mapBuilder.create(context.getServer()).thenCompose(map -> {
 			BubbleWorldConfig worldConfig = new BubbleWorldConfig()
 				.setGenerator(map.createGenerator(context.getServer()))
 				.setDefaultGameMode(GameMode.ADVENTURE);
-			GameWorld gameWorld = context.openWorld(worldConfig);
 
-			ShardThiefWaitingPhase waiting = new ShardThiefWaitingPhase(gameWorld, map, context.getConfig());
+			return context.openWorld(worldConfig).thenApply(gameWorld -> {
+				ShardThiefWaitingPhase waiting = new ShardThiefWaitingPhase(gameWorld, map, context.getConfig());
 
-			gameWorld.openGame(game -> {
-				ShardThiefActivePhase.setRules(game, RuleResult.DENY);
+				gameWorld.openGame(game -> {
+					ShardThiefActivePhase.setRules(game, RuleResult.DENY);
 
-				// Listeners
-				game.on(PlayerAddListener.EVENT, waiting::addPlayer);
-				game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
-				game.on(OfferPlayerListener.EVENT, waiting::offerPlayer);
-				game.on(RequestStartListener.EVENT, waiting::requestStart);
+					// Listeners
+					game.on(PlayerAddListener.EVENT, waiting::addPlayer);
+					game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
+					game.on(OfferPlayerListener.EVENT, waiting::offerPlayer);
+					game.on(RequestStartListener.EVENT, waiting::requestStart);
+				});
+
+				return gameWorld;
 			});
 		});
 	}
@@ -66,11 +69,11 @@ public class ShardThiefWaitingPhase {
 	private StartResult requestStart() {
 		PlayerConfig playerConfig = this.config.getPlayerConfig();
 		if (this.gameWorld.getPlayerCount() < playerConfig.getMinPlayers()) {
-			return StartResult.notEnoughPlayers();
+			return StartResult.NOT_ENOUGH_PLAYERS;
 		}
 
 		ShardThiefActivePhase.open(this.gameWorld, this.map, this.config);
-		return StartResult.ok();
+		return StartResult.OK;
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {

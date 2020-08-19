@@ -45,7 +45,7 @@ public class ShardThiefActivePhase {
 	private final ShardThiefMap map;
 	private final ShardThiefConfig config;
 	private final Set<PlayerShardEntry> players;
-	private final ShardThiefCountBar countBar = new ShardThiefCountBar();
+	private final ShardThiefCountBar countBar;
 
 	private PlayerShardEntry shardHolder;
 	private int ticksUntilCount;
@@ -61,6 +61,8 @@ public class ShardThiefActivePhase {
 		this.players = players.stream().map(player -> {
 			return new PlayerShardEntry(player, this.config.getStartingCounts(), this.config.getShardInvulnerability());
 		}).collect(Collectors.toSet());
+
+		this.countBar = new ShardThiefCountBar(this.gameWorld);
 
 		BlockPos size = this.map.getStructure().getSize();
 		this.placeShard(new BlockPos(size.getX(), 64, size.getZ()));
@@ -141,10 +143,7 @@ public class ShardThiefActivePhase {
 
 	private void sendStealMessage() {
 		Text stealText = this.shardHolder.getStealMessage();
-		for (PlayerShardEntry entry : this.players) {
-			TitleS2CPacket packet = new TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, stealText);
-			entry.getPlayer().networkHandler.sendPacket(packet);
-		}
+		this.gameWorld.getPlayerSet().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, stealText));
 	}
 
 	private void pickUpShard(PlayerShardEntry entry) {
@@ -202,23 +201,18 @@ public class ShardThiefActivePhase {
 		this.shardHolder.decrementCounts();
 		if (this.shardHolder.getCounts() <= 0) {
 			Text message = this.shardHolder.getWinMessage();
-			for (PlayerShardEntry entry : this.players) {
-				entry.getPlayer().sendMessage(message, false);
-				entry.getPlayer().playSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
-			}
+			this.gameWorld.getPlayerSet().sendMessage(message);
+
+			this.gameWorld.getPlayerSet().sendSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
 
 			this.gameWorld.close();
 			return;
 		} else if (this.shardHolder.getCounts() <= 5) {
 			String countString = Integer.toString(this.shardHolder.getCounts());
 			Text countText = new LiteralText(countString).formatted(this.getCountTitleColor()).formatted(Formatting.BOLD);
+			this.gameWorld.getPlayerSet().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, countText));
 
-			for (PlayerShardEntry entry : this.players) {
-				TitleS2CPacket packet = new TitleS2CPacket(TitleS2CPacket.Action.TITLE, countText);
-				entry.getPlayer().networkHandler.sendPacket(packet);
-	
-				entry.getPlayer().playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, SoundCategory.PLAYERS, 1, 1.5f);
-			}
+			this.gameWorld.getPlayerSet().sendSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, SoundCategory.PLAYERS, 1, 1.5f);
 		}
 
 		this.ticksUntilCount = 35;
@@ -273,7 +267,6 @@ public class ShardThiefActivePhase {
 
 	private void addPlayer(ServerPlayerEntity player) {
 		this.setSpectator(player);
-		this.countBar.addPlayer(player);
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
@@ -285,7 +278,6 @@ public class ShardThiefActivePhase {
 		this.players.removeIf(entry -> {
 			return player.equals(entry.getPlayer());
 		});
-		this.countBar.removePlayer(player);
 	}
 
 	private void applyStealSpeed(ServerPlayerEntity player) {
