@@ -1,8 +1,6 @@
 package io.github.haykam821.shardthief.game.phase;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Sets;
 import io.github.haykam821.shardthief.game.DroppedShard;
 import io.github.haykam821.shardthief.game.PlayerShardEntry;
 import io.github.haykam821.shardthief.game.ShardInventoryManager;
@@ -27,8 +25,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
-import xyz.nucleoid.plasmid.game.Game;
-import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.GameLogic;
+import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.event.GameCloseListener;
 import xyz.nucleoid.plasmid.game.event.GameOpenListener;
 import xyz.nucleoid.plasmid.game.event.GameTickListener;
@@ -38,10 +36,14 @@ import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.widget.GlobalWidgets;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ShardThiefActivePhase {
 	private final ServerWorld world;
-	private final GameWorld gameWorld;
+	private final GameSpace gameSpace;
 	private final ShardThiefMap map;
 	private final ShardThiefConfig config;
 	private final Set<PlayerShardEntry> players;
@@ -52,9 +54,9 @@ public class ShardThiefActivePhase {
 	private int ticksUntilKitRestock;
 	private DroppedShard droppedShard;
 
-	public ShardThiefActivePhase(GameWorld gameWorld, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players) {
-		this.world = gameWorld.getWorld();
-		this.gameWorld = gameWorld;
+	public ShardThiefActivePhase(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players, GlobalWidgets widgets) {
+		this.world = gameSpace.getWorld();
+		this.gameSpace = gameSpace;
 		this.map = map;
 		this.config = config;
 
@@ -62,13 +64,13 @@ public class ShardThiefActivePhase {
 			return new PlayerShardEntry(player, this.config.getStartingCounts(), this.config.getShardInvulnerability());
 		}).collect(Collectors.toSet());
 
-		this.countBar = new ShardThiefCountBar(this.gameWorld);
+		this.countBar = new ShardThiefCountBar(widgets);
 
 		BlockPos size = this.map.getStructure().getSize();
 		this.placeShard(new BlockPos(size.getX(), 64, size.getZ()));
 	}
 
-	public static void setRules(Game game, RuleResult pvpRule) {
+	public static void setRules(GameLogic game, RuleResult pvpRule) {
 		game.setRule(GameRule.CRAFTING, RuleResult.DENY);
 		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
 		game.setRule(GameRule.HUNGER, RuleResult.DENY);
@@ -77,10 +79,11 @@ public class ShardThiefActivePhase {
 		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 	}
 
-	public static void open(GameWorld gameWorld, ShardThiefMap map, ShardThiefConfig config) {
-		ShardThiefActivePhase active = new ShardThiefActivePhase(gameWorld, map, config, gameWorld.getPlayers());
+	public static void open(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config) {
+		gameSpace.openGame(game -> {
+			GlobalWidgets widgets = new GlobalWidgets(game);
 
-		gameWorld.openGame(game -> {
+			ShardThiefActivePhase active = new ShardThiefActivePhase(gameSpace, map, config, Sets.newHashSet(gameSpace.getPlayers()), widgets);
 			ShardThiefActivePhase.setRules(game, RuleResult.ALLOW);
 
 			// Listeners
@@ -143,7 +146,7 @@ public class ShardThiefActivePhase {
 
 	private void sendStealMessage() {
 		Text stealText = this.shardHolder.getStealMessage();
-		this.gameWorld.getPlayerSet().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, stealText));
+		this.gameSpace.getPlayers().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.ACTIONBAR, stealText));
 	}
 
 	private void pickUpShard(PlayerShardEntry entry) {
@@ -201,18 +204,18 @@ public class ShardThiefActivePhase {
 		this.shardHolder.decrementCounts();
 		if (this.shardHolder.getCounts() <= 0) {
 			Text message = this.shardHolder.getWinMessage();
-			this.gameWorld.getPlayerSet().sendMessage(message);
+			this.gameSpace.getPlayers().sendMessage(message);
 
-			this.gameWorld.getPlayerSet().sendSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
+			this.gameSpace.getPlayers().sendSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
 
-			this.gameWorld.close();
+			this.gameSpace.close();
 			return;
 		} else if (this.shardHolder.getCounts() <= 5) {
 			String countString = Integer.toString(this.shardHolder.getCounts());
 			Text countText = new LiteralText(countString).formatted(this.getCountTitleColor()).formatted(Formatting.BOLD);
-			this.gameWorld.getPlayerSet().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, countText));
+			this.gameSpace.getPlayers().sendPacket(new TitleS2CPacket(TitleS2CPacket.Action.TITLE, countText));
 
-			this.gameWorld.getPlayerSet().sendSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, SoundCategory.PLAYERS, 1, 1.5f);
+			this.gameSpace.getPlayers().sendSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, SoundCategory.PLAYERS, 1, 1.5f);
 		}
 
 		this.ticksUntilCount = 35;
@@ -312,9 +315,9 @@ public class ShardThiefActivePhase {
 		}
 	}
 
-	private boolean onPlayerDamage(ServerPlayerEntity damagedPlayer, DamageSource source, float damage) {
+	private ActionResult onPlayerDamage(ServerPlayerEntity damagedPlayer, DamageSource source, float damage) {
 		this.tryTransferShard(damagedPlayer, source);
-		return true;
+		return ActionResult.FAIL;
 	}
 
 	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
