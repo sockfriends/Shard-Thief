@@ -1,0 +1,13 @@
+{
+	"type": "shardthief:shard_thief",
+	"name": "Shard Thief: Jungle Temple",
+	"map": {
+		"structure_id": "shardthief:jungle_temple",
+		"biome_id": "minecraft:jungle",
+		"spawn_y_offset": 2
+	},
+	"players": {
+		"min": 1,
+		"max": 32
+	}
+}

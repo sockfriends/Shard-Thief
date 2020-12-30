@@ -1,7 +1,9 @@
 package io.github.haykam821.shardthief.game.map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -14,15 +16,18 @@ import net.minecraft.structure.rule.AlwaysTrueRuleTest;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ChunkRegion;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.StructuresConfig;
 import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 
 public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 	private final Structure structure;
 
-	public ShardThiefChunkGenerator(MinecraftServer server, Structure structure) {
-		super(server);
+	public ShardThiefChunkGenerator(RegistryKey<Biome> biome, Structure structure, MinecraftServer server) {
+		super(GameChunkGenerator.createBiomeSource(server, biome), new StructuresConfig(Optional.empty(), Collections.emptyMap()));
 		this.structure = structure;
 	}
 

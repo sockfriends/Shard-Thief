@@ -2,7 +2,6 @@ package io.github.haykam821.shardthief.game.phase;
 
 import io.github.haykam821.shardthief.game.ShardThiefConfig;
 import io.github.haykam821.shardthief.game.map.ShardThiefMap;
-import io.github.haykam821.shardthief.game.map.ShardThiefMapBuilder;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -30,17 +29,17 @@ public class ShardThiefWaitingPhase {
 	}
 
 	public static GameOpenProcedure open(GameOpenContext<ShardThiefConfig> context) {
-		ShardThiefMapBuilder mapBuilder = new ShardThiefMapBuilder();
-		ShardThiefMap map = mapBuilder.create(context.getServer());
+		ShardThiefConfig config = context.getConfig();
+		ShardThiefMap map = new ShardThiefMap(config.getMapConfig(), context.getServer());
 
 		BubbleWorldConfig worldConfig = new BubbleWorldConfig()
 			.setGenerator(map.createGenerator(context.getServer()))
 			.setDefaultGameMode(GameMode.ADVENTURE);
 
 		return context.createOpenProcedure(worldConfig, game -> {
-			ShardThiefWaitingPhase waiting = new ShardThiefWaitingPhase(game.getSpace(), map, context.getConfig());
+			ShardThiefWaitingPhase waiting = new ShardThiefWaitingPhase(game.getSpace(), map, config);
 
-			GameWaitingLobby.applyTo(game, context.getConfig().getPlayerConfig());
+			GameWaitingLobby.applyTo(game, config.getPlayerConfig());
 
 			ShardThiefActivePhase.setRules(game, RuleResult.DENY);
 

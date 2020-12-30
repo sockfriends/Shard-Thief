@@ -66,14 +66,14 @@ public class ShardThiefActivePhase {
 
 		this.countBar = new ShardThiefCountBar(widgets);
 
-		BlockPos size = this.map.getStructure().getSize();
-		this.placeShard(new BlockPos(size.getX(), 64, size.getZ()));
+		this.placeShard(this.map.getCenterSpawnPos().down());
 	}
 
 	public static void setRules(GameLogic game, RuleResult pvpRule) {
 		game.setRule(GameRule.CRAFTING, RuleResult.DENY);
 		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
 		game.setRule(GameRule.HUNGER, RuleResult.DENY);
+		game.setRule(GameRule.INTERACTION, RuleResult.DENY);
 		game.setRule(GameRule.PORTALS, RuleResult.DENY);
 		game.setRule(GameRule.PVP, pvpRule);
 		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
@@ -326,11 +326,9 @@ public class ShardThiefActivePhase {
 	}
 
 	public static void spawn(ServerWorld world, ShardThiefMap map, ServerPlayerEntity player, int index) {
-		BlockPos size = map.getStructure().getSize();
-
 		Direction direction = Direction.fromHorizontal(index);
 		int distance = (int) Math.min(index / 4f + 4, 8);
-		BlockPos pos = new BlockPos(size.getX(), 65, size.getZ()).offset(direction.getOpposite(), distance);
+		BlockPos pos = map.getCenterSpawnPos().offset(direction.getOpposite(), distance);
 
 		player.teleport(world, pos.getX(), pos.getY(), pos.getZ(), direction.asRotation(), 0);
 	}
