@@ -65,16 +65,14 @@ public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 		if (region.getCenterChunkX() != 0) return;
 		if (region.getCenterChunkZ() != 0) return;
 
-		BlockPos pos = new BlockPos(0, 64, 0);
-
 		BlockPos size = this.structure.getSize();
 		int x = size.getX() * 2 - 1;
 		int z = size.getZ() * 2 - 1;
 
-		this.placeStructure(region, pos, BlockRotation.NONE, Blocks.LIME_TERRACOTTA, Blocks.LIME_CONCRETE);
-		this.placeStructure(region, pos.add(x, 0, 0), BlockRotation.CLOCKWISE_90, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.BLUE_CONCRETE);
-		this.placeStructure(region, pos.add(x, 0, z), BlockRotation.CLOCKWISE_180, Blocks.RED_TERRACOTTA, Blocks.RED_CONCRETE);
-		this.placeStructure(region, pos.add(0, 0, z), BlockRotation.COUNTERCLOCKWISE_90, Blocks.YELLOW_TERRACOTTA, Blocks.YELLOW_CONCRETE);
+		this.placeStructure(region, ShardThiefMap.ORIGIN, BlockRotation.NONE, Blocks.LIME_TERRACOTTA, Blocks.LIME_CONCRETE);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, 0), BlockRotation.CLOCKWISE_90, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.BLUE_CONCRETE);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, z), BlockRotation.CLOCKWISE_180, Blocks.RED_TERRACOTTA, Blocks.RED_CONCRETE);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(0, 0, z), BlockRotation.COUNTERCLOCKWISE_90, Blocks.YELLOW_TERRACOTTA, Blocks.YELLOW_CONCRETE);
 	}
 
 	@Override

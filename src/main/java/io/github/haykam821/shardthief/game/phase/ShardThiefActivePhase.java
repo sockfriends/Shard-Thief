@@ -258,6 +258,8 @@ public class ShardThiefActivePhase {
 			if (entry.equals(this.shardHolder)) continue;
 
 			ServerPlayerEntity player = entry.getPlayer();
+			ShardThiefActivePhase.respawnIfOutOfBounds(player, this.map, this.gameSpace.getWorld());
+
 			if (this.canPlayerPickUpDroppedShard(player)) {
 				this.pickUpShard(entry);
 			}
@@ -331,5 +333,11 @@ public class ShardThiefActivePhase {
 		BlockPos pos = map.getCenterSpawnPos().offset(direction.getOpposite(), distance);
 
 		player.teleport(world, pos.getX(), pos.getY(), pos.getZ(), direction.asRotation(), 0);
+	}
+
+	public static void respawnIfOutOfBounds(ServerPlayerEntity player, ShardThiefMap map, ServerWorld world) {
+		if (!map.getBox().contains(player.getBlockPos())) {
+			ShardThiefActivePhase.spawn(world, map, player, 0);
+		}
 	}
 }

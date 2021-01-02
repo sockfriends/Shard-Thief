@@ -12,6 +12,7 @@ import xyz.nucleoid.plasmid.game.GameOpenProcedure;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameWaitingLobby;
 import xyz.nucleoid.plasmid.game.StartResult;
+import xyz.nucleoid.plasmid.game.event.GameTickListener;
 import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.event.RequestStartListener;
@@ -44,10 +45,17 @@ public class ShardThiefWaitingPhase {
 			ShardThiefActivePhase.setRules(game, RuleResult.DENY);
 
 			// Listeners
+			game.on(GameTickListener.EVENT, waiting::tick);
 			game.on(PlayerAddListener.EVENT, waiting::addPlayer);
 			game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
 			game.on(RequestStartListener.EVENT, waiting::requestStart);
 		});
+	}
+
+	private void tick() {
+		for (ServerPlayerEntity player : this.gameSpace.getPlayers()) {
+			ShardThiefActivePhase.respawnIfOutOfBounds(player, this.map, this.gameSpace.getWorld());
+		}
 	}
 
 	private StartResult requestStart() {
