@@ -19,7 +19,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.GenerationStep.Carver;
 import net.minecraft.world.gen.chunk.StructuresConfig;
 import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 
@@ -38,7 +41,6 @@ public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 			output.getDefaultState()
 		);
 	}
-
 
 	private List<StructureProcessorRule> getRules(Block terracotta, Block concrete) {
 		List<StructureProcessorRule> rules = new ArrayList<>();
@@ -73,5 +75,10 @@ public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 		this.placeStructure(region, pos.add(x, 0, 0), BlockRotation.CLOCKWISE_90, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.BLUE_CONCRETE);
 		this.placeStructure(region, pos.add(x, 0, z), BlockRotation.CLOCKWISE_180, Blocks.RED_TERRACOTTA, Blocks.RED_CONCRETE);
 		this.placeStructure(region, pos.add(0, 0, z), BlockRotation.COUNTERCLOCKWISE_90, Blocks.YELLOW_TERRACOTTA, Blocks.YELLOW_CONCRETE);
+	}
+
+	@Override
+	public void carve(long seed, BiomeAccess access, Chunk chunk, Carver carver) {
+		return;
 	}
 }
