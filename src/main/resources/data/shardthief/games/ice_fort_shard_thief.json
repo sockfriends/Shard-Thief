@@ -1,0 +1,13 @@
+{
+	"type": "shardthief:shard_thief",
+	"name": "Shard Thief: Ice Fort",
+	"map": {
+		"structure_id": "shardthief:ice_fort",
+		"biome_id": "minecraft:ice_spikes",
+		"spawn_y_offset": 3
+	},
+	"players": {
+		"min": 1,
+		"max": 32
+	}
+}

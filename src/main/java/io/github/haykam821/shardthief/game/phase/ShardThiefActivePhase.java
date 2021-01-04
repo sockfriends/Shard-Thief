@@ -1,6 +1,11 @@
 package io.github.haykam821.shardthief.game.phase;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.Sets;
+
+import io.github.haykam821.shardthief.Main;
 import io.github.haykam821.shardthief.game.DroppedShard;
 import io.github.haykam821.shardthief.game.PlayerShardEntry;
 import io.github.haykam821.shardthief.game.ShardInventoryManager;
@@ -38,9 +43,6 @@ import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 public class ShardThiefActivePhase {
 	private final ServerWorld world;
 	private final GameSpace gameSpace;
@@ -73,6 +75,7 @@ public class ShardThiefActivePhase {
 		game.setRule(GameRule.CRAFTING, RuleResult.DENY);
 		game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
 		game.setRule(GameRule.HUNGER, RuleResult.DENY);
+		game.setRule(Main.ICE_MELTING, RuleResult.DENY);
 		game.setRule(GameRule.INTERACTION, RuleResult.DENY);
 		game.setRule(GameRule.PORTALS, RuleResult.DENY);
 		game.setRule(GameRule.PVP, pvpRule);
