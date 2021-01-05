@@ -1,0 +1,13 @@
+{
+	"type": "shardthief:shard_thief",
+	"name": "Shard Thief: Dense Forest",
+	"map": {
+		"structure_id": "shardthief:dense_forest",
+		"biome_id": "minecraft:forest",
+		"spawn_y_offset": 5
+	},
+	"players": {
+		"min": 1,
+		"max": 32
+	}
+}
