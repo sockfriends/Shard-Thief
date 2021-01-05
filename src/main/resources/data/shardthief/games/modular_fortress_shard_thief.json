@@ -1,0 +1,20 @@
+{
+	"type": "shardthief:shard_thief",
+	"name": "Shard Thief: Modular Fortress",
+	"map": {
+		"structure_id": "shardthief:modular_fortress",
+		"biome_id": "minecraft:the_void",
+		"concrete_rule": {
+			"predicate_type": "minecraft:block_match",
+			"block": "minecraft:black_concrete"
+		},
+		"stained_glass_rule": {
+			"predicate_type": "minecraft:block_match",
+			"block": "minecraft:black_stained_glass"
+		}
+	},
+	"players": {
+		"min": 1,
+		"max": 32
+	}
+}

@@ -4,8 +4,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public final class ShardThiefMap {
@@ -47,6 +45,6 @@ public final class ShardThiefMap {
 	}
 
 	public ChunkGenerator createGenerator(MinecraftServer server) {
-		return new ShardThiefChunkGenerator(RegistryKey.of(Registry.BIOME_KEY, this.mapConfig.getBiomeId()), this.structure, server);
+		return new ShardThiefChunkGenerator(this.mapConfig, this.structure, server);
 	}
 }
