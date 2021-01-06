@@ -45,21 +45,22 @@ public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 		);
 	}
 
-	private List<StructureProcessorRule> getRules(Block terracotta, Block concrete, Block stainedGlass) {
+	private List<StructureProcessorRule> getRules(Block terracotta, Block concrete, Block stainedGlass, Block wool) {
 		List<StructureProcessorRule> rules = new ArrayList<>();
 
 		rules.add(this.getReplaceRule(this.mapConfig.getTerracottaRule(), terracotta));
 		rules.add(this.getReplaceRule(this.mapConfig.getConcreteRule(), concrete));
 		rules.add(this.getReplaceRule(this.mapConfig.getStainedGlassRule(), stainedGlass));
+		rules.add(this.getReplaceRule(this.mapConfig.getWoolRule(), wool));
 	
 		return rules;
 	}
 
-	private void placeStructure(ChunkRegion region, BlockPos pos, BlockRotation rotation, Block terracotta, Block concrete, Block stainedGlass) {
+	private void placeStructure(ChunkRegion region, BlockPos pos, BlockRotation rotation, Block terracotta, Block concrete, Block stainedGlass, Block wool) {
 		StructurePlacementData placementData = new StructurePlacementData();
 
 		placementData.setRotation(rotation);
-		placementData.addProcessor(new RuleStructureProcessor(this.getRules(terracotta, concrete, stainedGlass)));
+		placementData.addProcessor(new RuleStructureProcessor(this.getRules(terracotta, concrete, stainedGlass, wool)));
 
 		this.structure.place(region, pos, placementData, region.getRandom());
 	}
@@ -73,10 +74,10 @@ public final class ShardThiefChunkGenerator extends GameChunkGenerator {
 		int x = size.getX() * 2 - 1;
 		int z = size.getZ() * 2 - 1;
 
-		this.placeStructure(region, ShardThiefMap.ORIGIN, BlockRotation.NONE, Blocks.LIME_TERRACOTTA, Blocks.LIME_CONCRETE, Blocks.LIME_STAINED_GLASS);
-		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, 0), BlockRotation.CLOCKWISE_90, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.BLUE_CONCRETE ,Blocks.BLUE_STAINED_GLASS);
-		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, z), BlockRotation.CLOCKWISE_180, Blocks.RED_TERRACOTTA, Blocks.RED_CONCRETE, Blocks.RED_STAINED_GLASS);
-		this.placeStructure(region, ShardThiefMap.ORIGIN.add(0, 0, z), BlockRotation.COUNTERCLOCKWISE_90, Blocks.YELLOW_TERRACOTTA, Blocks.YELLOW_CONCRETE, Blocks.YELLOW_STAINED_GLASS);
+		this.placeStructure(region, ShardThiefMap.ORIGIN, BlockRotation.NONE, Blocks.LIME_TERRACOTTA, Blocks.LIME_CONCRETE, Blocks.LIME_STAINED_GLASS, Blocks.LIME_WOOL);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, 0), BlockRotation.CLOCKWISE_90, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.BLUE_CONCRETE, Blocks.BLUE_STAINED_GLASS, Blocks.BLUE_WOOL);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(x, 0, z), BlockRotation.CLOCKWISE_180, Blocks.RED_TERRACOTTA, Blocks.RED_CONCRETE, Blocks.RED_STAINED_GLASS, Blocks.RED_WOOL);
+		this.placeStructure(region, ShardThiefMap.ORIGIN.add(0, 0, z), BlockRotation.COUNTERCLOCKWISE_90, Blocks.YELLOW_TERRACOTTA, Blocks.YELLOW_CONCRETE, Blocks.YELLOW_STAINED_GLASS, Blocks.YELLOW_WOOL);
 	}
 
 	@Override
