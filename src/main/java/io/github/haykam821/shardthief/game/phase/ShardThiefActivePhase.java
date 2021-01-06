@@ -124,6 +124,10 @@ public class ShardThiefActivePhase {
 		return this.shardHolder.getCounts() / (float) this.config.getStartingCounts();
 	}
 
+	private void resetTicksUntilCount() {
+		this.ticksUntilCount = this.config.getCountDuration();
+	}
+
 	private void clearShard() {
 		if (this.shardHolder == null) return;
 
@@ -135,7 +139,7 @@ public class ShardThiefActivePhase {
 		}
 		this.shardHolder = null;
 
-		this.ticksUntilCount = 35;
+		this.resetTicksUntilCount();
 	}
 
 	private void setShardHolder(PlayerShardEntry entry) {
@@ -221,7 +225,7 @@ public class ShardThiefActivePhase {
 			this.gameSpace.getPlayers().sendSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, SoundCategory.PLAYERS, 1, 1.5f);
 		}
 
-		this.ticksUntilCount = 35;
+		this.resetTicksUntilCount();
 	}
 
 	private boolean canPlayerPickUpDroppedShard(PlayerEntity player) {

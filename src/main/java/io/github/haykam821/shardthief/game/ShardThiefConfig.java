@@ -13,6 +13,7 @@ public class ShardThiefConfig {
 			PlayerConfig.CODEC.fieldOf("players").forGetter(ShardThiefConfig::getPlayerConfig),
 			Codec.INT.optionalFieldOf("starting_counts", 20).forGetter(ShardThiefConfig::getStartingCounts),
 			Codec.INT.optionalFieldOf("restart_counts", 5).forGetter(ShardThiefConfig::getRestartCounts),
+			Codec.INT.optionalFieldOf("count_duration", 20).forGetter(ShardThiefConfig::getCountDuration),
 			Codec.INT.optionalFieldOf("shard_invulnerability", 10).forGetter(ShardThiefConfig::getShardInvulnerability),
 			Codec.INT.optionalFieldOf("kit_restock_interval", 20 * 5).forGetter(ShardThiefConfig::getKitRestockInterval),
 			Codec.INT.optionalFieldOf("max_arrows", 3).forGetter(ShardThiefConfig::getMaxArrows),
@@ -24,16 +25,18 @@ public class ShardThiefConfig {
 	private final PlayerConfig playerConfig;
 	private final int startingCounts;
 	private final int restartCounts;
+	private final int countDuration;
 	private final int shardInvulnerability;
 	private final int kitRestockInterval;
 	private final int maxArrows;
 	private final int speedAmplifier;
 
-	public ShardThiefConfig(ShardThiefMapConfig mapConfig, PlayerConfig playerConfig, int startingCounts, int restartCounts, int shardInvulnerability, int kitRestockInterval, int maxArrows, int speedAmplifier) {
+	public ShardThiefConfig(ShardThiefMapConfig mapConfig, PlayerConfig playerConfig, int startingCounts, int restartCounts, int countDuration, int shardInvulnerability, int kitRestockInterval, int maxArrows, int speedAmplifier) {
 		this.mapConfig = mapConfig;
 		this.playerConfig = playerConfig;
 		this.startingCounts = startingCounts;
 		this.restartCounts = restartCounts;
+		this.countDuration = countDuration;
 		this.shardInvulnerability = shardInvulnerability;
 		this.kitRestockInterval = kitRestockInterval;
 		this.maxArrows = maxArrows;
@@ -54,6 +57,10 @@ public class ShardThiefConfig {
 
 	public int getRestartCounts() {
 		return this.restartCounts;
+	}
+
+	public int getCountDuration() {
+		return this.countDuration;
 	}
 
 	public int getShardInvulnerability() {
