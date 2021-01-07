@@ -13,7 +13,7 @@ public class ShardThiefConfig {
 			PlayerConfig.CODEC.fieldOf("players").forGetter(ShardThiefConfig::getPlayerConfig),
 			Codec.INT.optionalFieldOf("starting_counts", 20).forGetter(ShardThiefConfig::getStartingCounts),
 			Codec.INT.optionalFieldOf("restart_counts", 5).forGetter(ShardThiefConfig::getRestartCounts),
-			Codec.INT.optionalFieldOf("count_duration", 20).forGetter(ShardThiefConfig::getCountDuration),
+			Codec.INT.optionalFieldOf("count_duration", 35).forGetter(ShardThiefConfig::getCountDuration),
 			Codec.INT.optionalFieldOf("shard_invulnerability", 10).forGetter(ShardThiefConfig::getShardInvulnerability),
 			Codec.INT.optionalFieldOf("kit_restock_interval", 20 * 5).forGetter(ShardThiefConfig::getKitRestockInterval),
 			Codec.INT.optionalFieldOf("max_arrows", 3).forGetter(ShardThiefConfig::getMaxArrows),
