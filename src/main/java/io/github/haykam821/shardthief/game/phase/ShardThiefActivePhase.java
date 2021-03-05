@@ -30,6 +30,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameLogic;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.event.GameCloseListener;
@@ -215,7 +216,7 @@ public class ShardThiefActivePhase {
 
 			this.gameSpace.getPlayers().sendSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1);
 
-			this.gameSpace.close();
+			this.gameSpace.close(GameCloseReason.FINISHED);
 			return;
 		} else if (this.shardHolder.getCounts() <= 5) {
 			String countString = Integer.toString(this.shardHolder.getCounts());
