@@ -2,15 +2,15 @@ package io.github.haykam821.shardthief.game;
 
 import io.github.haykam821.shardthief.game.phase.ShardThiefActivePhase;
 import net.minecraft.entity.boss.BossBar;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
 import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
 public class ShardThiefCountBar {
 	private final BossBarWidget bar;
 
-	public ShardThiefCountBar(GlobalWidgets widgets) {
-		this.bar = widgets.addBossBar(new LiteralText("Shard Thief"), BossBar.Color.BLUE, BossBar.Style.PROGRESS);
+	public ShardThiefCountBar(Text title, GlobalWidgets widgets) {
+		this.bar = widgets.addBossBar(title, BossBar.Color.BLUE, BossBar.Style.PROGRESS);
 	}
 
 	public void tick(ShardThiefActivePhase phase) {

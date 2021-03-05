@@ -67,7 +67,7 @@ public class ShardThiefActivePhase {
 			return new PlayerShardEntry(player, this.config.getStartingCounts(), this.config.getShardInvulnerability());
 		}).collect(Collectors.toSet());
 
-		this.countBar = new ShardThiefCountBar(widgets);
+		this.countBar = new ShardThiefCountBar(gameSpace.getGameConfig().getNameText(), widgets);
 
 		this.placeShard(this.map.getCenterSpawnPos().down());
 	}
