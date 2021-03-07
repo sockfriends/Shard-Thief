@@ -11,6 +11,7 @@ public class ShardThiefConfig {
 		return instance.group(
 			ShardThiefMapConfig.CODEC.fieldOf("map").forGetter(ShardThiefConfig::getMapConfig),
 			PlayerConfig.CODEC.fieldOf("players").forGetter(ShardThiefConfig::getPlayerConfig),
+			Codec.INT.optionalFieldOf("guide_ticks", 20 * 10).forGetter(ShardThiefConfig::getGuideTicks),
 			Codec.INT.optionalFieldOf("starting_counts", 20).forGetter(ShardThiefConfig::getStartingCounts),
 			Codec.INT.optionalFieldOf("restart_counts", 5).forGetter(ShardThiefConfig::getRestartCounts),
 			Codec.INT.optionalFieldOf("count_duration", 35).forGetter(ShardThiefConfig::getCountDuration),
@@ -23,6 +24,7 @@ public class ShardThiefConfig {
 
 	private final ShardThiefMapConfig mapConfig;
 	private final PlayerConfig playerConfig;
+	private final int guideTicks;
 	private final int startingCounts;
 	private final int restartCounts;
 	private final int countDuration;
@@ -31,9 +33,10 @@ public class ShardThiefConfig {
 	private final int maxArrows;
 	private final int speedAmplifier;
 
-	public ShardThiefConfig(ShardThiefMapConfig mapConfig, PlayerConfig playerConfig, int startingCounts, int restartCounts, int countDuration, int shardInvulnerability, int kitRestockInterval, int maxArrows, int speedAmplifier) {
+	public ShardThiefConfig(ShardThiefMapConfig mapConfig, PlayerConfig playerConfig, int guideTicks, int startingCounts, int restartCounts, int countDuration, int shardInvulnerability, int kitRestockInterval, int maxArrows, int speedAmplifier) {
 		this.mapConfig = mapConfig;
 		this.playerConfig = playerConfig;
+		this.guideTicks = guideTicks;
 		this.startingCounts = startingCounts;
 		this.restartCounts = restartCounts;
 		this.countDuration = countDuration;
@@ -49,6 +52,10 @@ public class ShardThiefConfig {
 
 	public PlayerConfig getPlayerConfig() {
 		return this.playerConfig;
+	}
+
+	public int getGuideTicks() {
+		return this.guideTicks;
 	}
 
 	public int getStartingCounts() {

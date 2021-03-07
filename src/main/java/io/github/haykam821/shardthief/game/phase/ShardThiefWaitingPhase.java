@@ -1,17 +1,21 @@
 package io.github.haykam821.shardthief.game.phase;
 
 import io.github.haykam821.shardthief.game.ShardThiefConfig;
+import io.github.haykam821.shardthief.game.map.ShardThiefGuideText;
 import io.github.haykam821.shardthief.game.map.ShardThiefMap;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.fantasy.BubbleWorldConfig;
+import xyz.nucleoid.plasmid.entity.FloatingText;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameOpenProcedure;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameWaitingLobby;
 import xyz.nucleoid.plasmid.game.StartResult;
+import xyz.nucleoid.plasmid.game.event.GameOpenListener;
 import xyz.nucleoid.plasmid.game.event.GameTickListener;
 import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
@@ -22,6 +26,7 @@ public class ShardThiefWaitingPhase {
 	private final GameSpace gameSpace;
 	private final ShardThiefMap map;
 	private final ShardThiefConfig config;
+	private FloatingText guideText;
 
 	public ShardThiefWaitingPhase(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config) {
 		this.gameSpace = gameSpace;
@@ -45,11 +50,20 @@ public class ShardThiefWaitingPhase {
 			ShardThiefActivePhase.setRules(game, RuleResult.DENY);
 
 			// Listeners
+			game.on(GameOpenListener.EVENT, waiting::open);
 			game.on(GameTickListener.EVENT, waiting::tick);
 			game.on(PlayerAddListener.EVENT, waiting::addPlayer);
 			game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
 			game.on(RequestStartListener.EVENT, waiting::requestStart);
 		});
+	}
+
+	private void open() {
+		// Spawn guide text
+		Vec3d center = Vec3d.of(this.map.getCenterSpawnPos()).add(0, 1.8, 0);
+		this.gameSpace.getWorld().getChunk(this.map.getCenterSpawnPos());
+
+		this.guideText = ShardThiefGuideText.spawn(this.gameSpace.getWorld(), center);
 	}
 
 	private void tick() {
@@ -59,7 +73,7 @@ public class ShardThiefWaitingPhase {
 	}
 
 	private StartResult requestStart() {
-		ShardThiefActivePhase.open(this.gameSpace, this.map, this.config);
+		ShardThiefActivePhase.open(this.gameSpace, this.map, this.config, this.guideText);
 		return StartResult.OK;
 	}
 

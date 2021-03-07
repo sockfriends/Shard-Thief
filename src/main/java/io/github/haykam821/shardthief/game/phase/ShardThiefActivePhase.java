@@ -30,6 +30,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.entity.FloatingText;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameLogic;
 import xyz.nucleoid.plasmid.game.GameSpace;
@@ -52,12 +53,15 @@ public class ShardThiefActivePhase {
 	private final Set<PlayerShardEntry> players;
 	private final ShardThiefCountBar countBar;
 
+	private final FloatingText guideText;
+	private int guideTicks;
+
 	private PlayerShardEntry shardHolder;
 	private int ticksUntilCount;
 	private int ticksUntilKitRestock;
 	private DroppedShard droppedShard;
 
-	public ShardThiefActivePhase(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players, GlobalWidgets widgets) {
+	public ShardThiefActivePhase(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config, Set<ServerPlayerEntity> players, GlobalWidgets widgets, FloatingText guideText) {
 		this.world = gameSpace.getWorld();
 		this.gameSpace = gameSpace;
 		this.map = map;
@@ -70,6 +74,9 @@ public class ShardThiefActivePhase {
 		this.countBar = new ShardThiefCountBar(gameSpace.getGameConfig().getNameText(), widgets);
 
 		this.placeShard(this.map.getCenterSpawnPos().down());
+
+		this.guideText = guideText;
+		this.guideTicks = this.config.getGuideTicks();
 	}
 
 	public static void setRules(GameLogic game, RuleResult pvpRule) {
@@ -83,11 +90,11 @@ public class ShardThiefActivePhase {
 		game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 	}
 
-	public static void open(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config) {
+	public static void open(GameSpace gameSpace, ShardThiefMap map, ShardThiefConfig config, FloatingText guideText) {
 		gameSpace.openGame(game -> {
 			GlobalWidgets widgets = new GlobalWidgets(game);
 
-			ShardThiefActivePhase active = new ShardThiefActivePhase(gameSpace, map, config, Sets.newHashSet(gameSpace.getPlayers()), widgets);
+			ShardThiefActivePhase active = new ShardThiefActivePhase(gameSpace, map, config, Sets.newHashSet(gameSpace.getPlayers()), widgets, guideText);
 			ShardThiefActivePhase.setRules(game, RuleResult.ALLOW);
 
 			// Listeners
@@ -244,6 +251,13 @@ public class ShardThiefActivePhase {
 
 	private void tick() {
 		this.countBar.tick(this);
+
+		// Remove guide text after guide ticks reach zero
+		if (this.guideTicks > 0) {
+			this.guideTicks -= 1;
+		} else if (this.guideText != null && this.guideTicks == 0) {
+			this.guideText.remove();
+		}
 
 		if (this.droppedShard != null) {
 			this.droppedShard.tick();
