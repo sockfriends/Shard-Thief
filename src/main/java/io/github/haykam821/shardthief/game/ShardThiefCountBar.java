@@ -3,14 +3,17 @@ package io.github.haykam821.shardthief.game;
 import io.github.haykam821.shardthief.game.phase.ShardThiefActivePhase;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
 import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
 public class ShardThiefCountBar {
+	private static final Formatting TITLE_COLOR = Formatting.AQUA;
+
 	private final BossBarWidget bar;
 
 	public ShardThiefCountBar(Text title, GlobalWidgets widgets) {
-		this.bar = widgets.addBossBar(title, BossBar.Color.BLUE, BossBar.Style.PROGRESS);
+		this.bar = widgets.addBossBar(title.shallowCopy().formatted(TITLE_COLOR), BossBar.Color.BLUE, BossBar.Style.PROGRESS);
 	}
 
 	public void tick(ShardThiefActivePhase phase) {
