@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 
@@ -19,11 +20,13 @@ public class DroppedShard implements Tickable {
 	private static final BlockState STAIRS_DROP_STATE = Blocks.PRISMARINE_STAIRS.getDefaultState();
 
 	private final BlockPos pos;
+	private final Box pickUpBox;
 	private final BlockState oldState;
 	private int invulnerability;
 
 	public DroppedShard(BlockPos pos, BlockState oldState, int invulnerability) {
 		this.pos = pos;
+		this.pickUpBox = new Box(pos, pos.add(1, 3, 1));
 		this.oldState = oldState;
 		this.invulnerability = invulnerability;
 	}
@@ -61,7 +64,7 @@ public class DroppedShard implements Tickable {
 	}
 
 	public boolean canPlayerPickUp(PlayerEntity player) {
-		return this.invulnerability <= 0 && this.pos.equals(player.getLandingPos());
+		return this.invulnerability <= 0 && this.pickUpBox.intersects(player.getBoundingBox());
 	}
 
 	@Override

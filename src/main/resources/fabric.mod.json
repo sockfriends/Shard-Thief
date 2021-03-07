@@ -19,7 +19,6 @@
 	"mixins": [
 		"shardthief.mixin.json"
 	],
-	"accessWidener": "shardthief.accesswidener",
 	"license": "MIT",
 	"icon": "assets/shardthief/icon.png",
 	"depends": {

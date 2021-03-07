@@ -22,10 +22,6 @@ repositories {
 	jcenter()
 }
 
-minecraft {
-	accessWidener = file("src/main/resources/shardthief.accesswidener")
-}
-
 dependencies {
 	// Main
 	minecraft("com.mojang:minecraft:${project.minecraft_version}")
