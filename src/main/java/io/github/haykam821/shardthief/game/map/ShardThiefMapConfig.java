@@ -17,6 +17,7 @@ public class ShardThiefMapConfig {
 			RuleTest.field_25012.optionalFieldOf("concrete_rule", new BlockMatchRuleTest(Blocks.WHITE_CONCRETE)).forGetter(ShardThiefMapConfig::getConcreteRule),
 			RuleTest.field_25012.optionalFieldOf("stained_glass_rule", new BlockMatchRuleTest(Blocks.WHITE_STAINED_GLASS)).forGetter(ShardThiefMapConfig::getStainedGlassRule),
 			RuleTest.field_25012.optionalFieldOf("wool_rule", new BlockMatchRuleTest(Blocks.WHITE_WOOL)).forGetter(ShardThiefMapConfig::getWoolRule),
+			RuleTest.field_25012.optionalFieldOf("carpet_rule", new BlockMatchRuleTest(Blocks.WHITE_CARPET)).forGetter(ShardThiefMapConfig::getCarpetRule),
 			Codec.INT.optionalFieldOf("spawn_y_offset", 1).forGetter(ShardThiefMapConfig::getSpawnYOffset)
 		).apply(instance, ShardThiefMapConfig::new);
 	});
@@ -27,15 +28,17 @@ public class ShardThiefMapConfig {
 	private final RuleTest concreteRule;
 	private final RuleTest stainedGlassRule;
 	private final RuleTest woolRule;
+	private final RuleTest carpetRule;
 	private final int spawnYOffset;
 
-	public ShardThiefMapConfig(Identifier structureId, Identifier biomeId, RuleTest terracottaRule, RuleTest concreteRule, RuleTest stainedGlassRule, RuleTest woolRule, int spawnYOffset) {
+	public ShardThiefMapConfig(Identifier structureId, Identifier biomeId, RuleTest terracottaRule, RuleTest concreteRule, RuleTest stainedGlassRule, RuleTest woolRule, RuleTest carpetRule, int spawnYOffset) {
 		this.structureId = structureId;
 		this.biomeId = biomeId;
 		this.terracottaRule = terracottaRule;
 		this.concreteRule = concreteRule;
 		this.stainedGlassRule = stainedGlassRule;
 		this.woolRule = woolRule;
+		this.carpetRule = carpetRule;
 		this.spawnYOffset = spawnYOffset;
 	}
 
@@ -61,6 +64,10 @@ public class ShardThiefMapConfig {
 
 	public RuleTest getWoolRule() {
 		return this.woolRule;
+	}
+
+	public RuleTest getCarpetRule() {
+		return this.carpetRule;
 	}
 
 	public int getSpawnYOffset() {
